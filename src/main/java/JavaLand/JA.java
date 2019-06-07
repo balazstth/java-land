@@ -36,7 +36,19 @@ public class JA {
     }
     
     //--------------------------------------------------------------------------
+    
+    public static void println(Object line) {
+        System.out.println(line);
+    }
+    
+    //--------------------------------------------------------------------------
 
+    /**
+     * Usage: JA.times(10, i -> JA.println("Iteration: " + i))
+     * Iterates from 1 to times.
+     * @param times
+     * @param fn 
+     */
     public static void times(int times, IntConsumer fn) {
         IntStream.rangeClosed(1, times).forEach(fn);
     }
