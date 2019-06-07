@@ -44,7 +44,7 @@ public class JA {
     //--------------------------------------------------------------------------
 
     /**
-     * Usage: JA.times(10, i -> JA.println("Iteration: " + i))
+     * Usage: JA.times(10, i -> JA.println("Iteration: " + i));
      * Iterates from 1 to times.
      * @param times
      * @param fn 
