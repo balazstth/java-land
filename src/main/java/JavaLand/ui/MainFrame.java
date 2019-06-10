@@ -15,6 +15,18 @@ import JavaLand.util.FrameMonitor;
 public class MainFrame extends javax.swing.JFrame {
 
     /**
+     * Singleton sub-windows
+     */
+    private NotepadFrame notepadFrame;
+    private PaletteFrame paletteFrame;
+    private AboutDialog aboutDialog;
+    
+    /**
+     * Padding for statusLabel
+     */
+    private final String statusPad = "  ";
+    
+    /**
      * Creates new form MainJFrame
      */
     public MainFrame() {
@@ -33,6 +45,7 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        statusLabel = new javax.swing.JLabel();
         mainMenuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         exitMenuItem = new javax.swing.JMenuItem();
@@ -42,11 +55,16 @@ public class MainFrame extends javax.swing.JFrame {
         gameMenu = new javax.swing.JMenu();
         invadersMenuItem = new javax.swing.JMenuItem();
         optionsMenu = new javax.swing.JMenu();
-        DefaultsMenuItem = new javax.swing.JMenuItem();
+        defaultsMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        statusLabel.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
+        statusLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        statusLabel.setMaximumSize(new java.awt.Dimension(999999999, 999999999));
+        statusLabel.setMinimumSize(new java.awt.Dimension(4, 25));
 
         fileMenu.setMnemonic('F');
         fileMenu.setText("File");
@@ -66,10 +84,17 @@ public class MainFrame extends javax.swing.JFrame {
         utilityMenu.setMnemonic('U');
         utilityMenu.setText("Utility");
 
+        notepadMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.ALT_MASK));
         notepadMenuItem.setMnemonic('N');
         notepadMenuItem.setText("Notepad");
+        notepadMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                notepadMenuItemActionPerformed(evt);
+            }
+        });
         utilityMenu.add(notepadMenuItem);
 
+        paletteMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.ALT_MASK));
         paletteMenuItem.setMnemonic('P');
         paletteMenuItem.setText("Palette");
         paletteMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -84,6 +109,7 @@ public class MainFrame extends javax.swing.JFrame {
         gameMenu.setMnemonic('G');
         gameMenu.setText("Game");
 
+        invadersMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.ALT_MASK));
         invadersMenuItem.setMnemonic('I');
         invadersMenuItem.setText("Invaders");
         gameMenu.add(invadersMenuItem);
@@ -93,14 +119,16 @@ public class MainFrame extends javax.swing.JFrame {
         optionsMenu.setMnemonic('O');
         optionsMenu.setText("Options");
 
-        DefaultsMenuItem.setMnemonic('D');
-        DefaultsMenuItem.setText("Defaults");
-        DefaultsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        defaultsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.ALT_MASK));
+        defaultsMenuItem.setMnemonic('D');
+        defaultsMenuItem.setText("Defaults");
+        defaultsMenuItem.setToolTipText("");
+        defaultsMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                DefaultsMenuItemActionPerformed(evt);
+                defaultsMenuItemActionPerformed(evt);
             }
         });
-        optionsMenu.add(DefaultsMenuItem);
+        optionsMenu.add(defaultsMenuItem);
 
         mainMenuBar.add(optionsMenu);
 
@@ -125,11 +153,13 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 868, Short.MAX_VALUE)
+            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 869, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 601, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(585, Short.MAX_VALUE)
+                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -141,25 +171,51 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
-        AboutDialog about = new AboutDialog(this, false); // or rootPaneCheckingEnabled
-        about.setVisible(true);
+        if (aboutDialog == null) 
+            aboutDialog = new AboutDialog(this, false); // or rootPaneCheckingEnabled
+        aboutDialog.setVisible(true);
     }//GEN-LAST:event_aboutMenuItemActionPerformed
 
     private void paletteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paletteMenuItemActionPerformed
-        PaletteFrame palette = new PaletteFrame();
-        palette.setVisible(true);
+        if (paletteFrame == null)
+            paletteFrame = new PaletteFrame();
+        paletteFrame.setVisible(true);
     }//GEN-LAST:event_paletteMenuItemActionPerformed
 
-    private void DefaultsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DefaultsMenuItemActionPerformed
+    private void defaultsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultsMenuItemActionPerformed
+        //----------------------------------------------------------------------
+        // MainFrame
         FrameMonitor.setDefaults(this, MainFrame.class.getName());
 
-        // TODO: think about generally not recreating and disposing child frames
-        // each time, but only hiding them
-        PaletteFrame palette = new PaletteFrame();
-        FrameMonitor.setDefaults(palette, PaletteFrame.class.getName());
-        palette.dispose();
-    }//GEN-LAST:event_DefaultsMenuItemActionPerformed
+        //----------------------------------------------------------------------
+        // Notepad
+        var dispose = false;
+        if (notepadFrame == null) {
+            notepadFrame = new NotepadFrame();
+            dispose = true;
+        }
+        FrameMonitor.setDefaults(notepadFrame, NotepadFrame.class.getName());
+        if (dispose)
+            notepadFrame.dispose();
 
+        //----------------------------------------------------------------------
+        // Palette
+        dispose = false;
+        if (paletteFrame == null) {
+            paletteFrame = new PaletteFrame();
+            dispose = true;
+        }
+        FrameMonitor.setDefaults(paletteFrame, PaletteFrame.class.getName());
+        if (dispose)
+            paletteFrame.dispose();
+    }//GEN-LAST:event_defaultsMenuItemActionPerformed
+
+    private void notepadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notepadMenuItemActionPerformed
+        if (notepadFrame == null)
+            notepadFrame = new NotepadFrame();
+        notepadFrame.setVisible(true);
+    }//GEN-LAST:event_notepadMenuItemActionPerformed
+    
     /**
      * @param args the command line arguments
      */
@@ -196,8 +252,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuItem DefaultsMenuItem;
     private javax.swing.JMenuItem aboutMenuItem;
+    private javax.swing.JMenuItem defaultsMenuItem;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu gameMenu;
@@ -207,6 +263,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem notepadMenuItem;
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JMenuItem paletteMenuItem;
+    private javax.swing.JLabel statusLabel;
     private javax.swing.JMenu utilityMenu;
     // End of variables declaration//GEN-END:variables
 }
