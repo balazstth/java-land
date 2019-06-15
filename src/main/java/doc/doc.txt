@@ -1,8 +1,4 @@
 
-Ctrl+W Close Internal Frame - maybe per IF, or central for the current IF
-Menu item for that
-Notepad save: on closeing IF AND on closing the app
-
 Palette - use the colors in Notepad
 Central / shared colors in the app
 
