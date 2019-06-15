@@ -5,24 +5,24 @@
  */
 package JavaLand.util;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.prefs.Preferences;
 
 /**
- *
+ * Works with JFrames and JInternalFrames as well
  * @author aladar
  */
-public class FrameMonitor {
+public class ContainerMonitor {
 
-    public static void registerFrame(JFrame frame, String frameUniqueId,
+    public static void registerContainer(Container container, String frameUniqueId,
                                      int defaultX, int defaultY, int defaultW, int defaultH) {
         Preferences prefs = Preferences.userRoot()
-                                       .node(FrameMonitor.class.getSimpleName() + "-" + frameUniqueId);
-        frame.setLocation(getFrameLocation(prefs, defaultX, defaultY));
-        frame.setSize(getFrameSize(prefs, defaultW, defaultH));
+                                       .node(ContainerMonitor.class.getSimpleName() + "-" + frameUniqueId);
+                
+        container.setLocation(getContainerLocation(prefs, defaultX, defaultY));
+        container.setSize(getContainerSize(prefs, defaultW, defaultH));
 
         // Store defaults
         prefs.putInt("default_x", defaultX);
@@ -31,9 +31,9 @@ public class FrameMonitor {
         prefs.putInt("default_h", defaultH);
         
         CoalescedEventUpdater updater = new CoalescedEventUpdater(400,
-                () -> updatePref(frame, prefs));
+                () -> updatePrefs(container, prefs));
 
-        frame.addComponentListener(new ComponentAdapter() {
+        container.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 updater.update();
@@ -46,9 +46,9 @@ public class FrameMonitor {
         });
     }
 
-    public static void setDefaults(JFrame frame, String frameUniqueId) {
+    public static void setDefaults(Container container, String frameUniqueId) {
         Preferences prefs = Preferences.userRoot()
-                                       .node(FrameMonitor.class.getSimpleName() + "-" + frameUniqueId);
+                                       .node(ContainerMonitor.class.getSimpleName() + "-" + frameUniqueId);
 
         int defaultX = prefs.getInt("default_x", 0);
         int defaultY = prefs.getInt("default_y", 0);
@@ -60,26 +60,26 @@ public class FrameMonitor {
         prefs.putInt("w", defaultW);
         prefs.putInt("h", defaultH);
 
-        frame.setLocation(getFrameLocation(prefs, defaultX, defaultY));
-        frame.setSize(getFrameSize(prefs, defaultW, defaultH));
+        container.setLocation(getContainerLocation(prefs, defaultX, defaultY));
+        container.setSize(getContainerSize(prefs, defaultW, defaultH));
     }
 
-    private static void updatePref(JFrame frame, Preferences prefs) {
-        Point location = frame.getLocation();
+    private static void updatePrefs(Container container, Preferences prefs) {
+        Point location = container.getLocation();
         prefs.putInt("x", location.x);
         prefs.putInt("y", location.y);
-        Dimension size = frame.getSize();
+        Dimension size = container.getSize();
         prefs.putInt("w", size.width);
         prefs.putInt("h", size.height);
     }
 
-    private static Dimension getFrameSize(Preferences pref, int defaultW, int defaultH) {
+    private static Dimension getContainerSize(Preferences pref, int defaultW, int defaultH) {
         int w = pref.getInt("w", defaultW);
         int h = pref.getInt("h", defaultH);
         return new Dimension(w, h);
     }
 
-    private static Point getFrameLocation(Preferences pref, int defaultX, int defaultY) {
+    private static Point getContainerLocation(Preferences pref, int defaultX, int defaultY) {
         int x = pref.getInt("x", defaultX);
         int y = pref.getInt("y", defaultY);
         return new Point(x, y);

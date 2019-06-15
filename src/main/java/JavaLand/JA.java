@@ -12,10 +12,13 @@ import java.util.stream.IntStream;
 
 /**
  * Java Land Application - Utility Library
- * Singleton also with static methods
  * @author aladar
  */
 public class JA {     
+
+    //==========================================================================
+    // Singleton
+    //==========================================================================
     private JA() {
     }
     
@@ -27,29 +30,41 @@ public class JA {
         private static final JA INSTANCE = new JA();
     }
     
-    //--------------------------------------------------------------------------
-    
+    //==========================================================================
+    // Forms a standard timestamp
+    //==========================================================================
     public static String getTimestamp() {
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
         return formatter.format(date);         
     }
     
-    //--------------------------------------------------------------------------
+    //==========================================================================
+    // Forms a unique ID for this run
+    //==========================================================================
+    private static int uniqueCounter = 0;
+            
+    public static long uniqueID() {
+        return uniqueCounter++;
+    }
     
+    //==========================================================================
+    // Will it ever be remembered to be used...?
+    //==========================================================================
     public static void println(Object line) {
         System.out.println(line);
     }
     
-    //--------------------------------------------------------------------------
-
+    //==========================================================================
+    // Simple iteration
+    //==========================================================================
     /**
-     * Usage: JA.times(10, i -> JA.println("Iteration: " + i));
-     * Iterates from 1 to times.
+     * Iterates from 0 to times-1.
+     * Usage example: JA.times(10, i -> JA.println("Iteration: " + i));
      * @param times
      * @param fn 
      */
     public static void times(int times, IntConsumer fn) {
-        IntStream.rangeClosed(1, times).forEach(fn);
+        IntStream.range(0, times).forEach(fn);
     }
 }

@@ -5,8 +5,17 @@
  */
 package JavaLand.ui;
 
-import JavaLand.JA;
-import JavaLand.util.FrameMonitor;
+import JavaLand.util.ContainerMonitor;
+import java.awt.image.BufferedImage;
+import java.beans.PropertyVetoException;
+import java.io.IOException;
+import java.net.URL;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -14,26 +23,43 @@ import JavaLand.util.FrameMonitor;
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    /**
-     * Singleton sub-windows
-     */
-    private NotepadFrame notepadFrame;
-    private PaletteFrame paletteFrame;
+    //==========================================================================
+    // Fields
+    //==========================================================================
+    private NotepadInternalFrame notepad;
+    private PaletteInternalFrame palette;
     private AboutDialog aboutDialog;
+
+    // Keeping a last focus list ourselves, since hiding a JInternalFrame does
+    // not automatically focus another one on JDesktopPane.
+    public LinkedList<JInternalFrame> lastFocus = new LinkedList<>();
     
-    /**
-     * Padding for statusLabel
-     */
-    private final String statusPad = "  ";
-    
+    //==========================================================================
+    // Constructor
+    //==========================================================================
     /**
      * Creates new form MainJFrame
      */
     public MainFrame() {
         initComponents();
         this.setTitle("Java Land");
-        FrameMonitor.registerFrame(this, MainFrame.class.getName(),
+        ContainerMonitor.registerContainer(this, MainFrame.class.getName(),
                 this.getX(), this.getY(), this.getWidth(), this.getHeight());
+
+        // Read the image that will be used as the application icon.
+        // Using "/" in front of the image file name will locate the
+        // image at the root folder of our application. If you don't
+        // use a "/" then the image file should be on the same folder
+        // with your class file.
+        // In a NetBeans project / = src/main/resources by default.
+        try {
+            URL resource = this.getClass().getResource("/icon.png");
+            BufferedImage image = ImageIO.read(resource);
+            this.setIconImage(image);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "There was an error while loading the program icon.");
+            Logger.getLogger(NotepadInternalFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -45,7 +71,7 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        statusLabel = new javax.swing.JLabel();
+        desktopPane = new javax.swing.JDesktopPane();
         mainMenuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         exitMenuItem = new javax.swing.JMenuItem();
@@ -56,15 +82,27 @@ public class MainFrame extends javax.swing.JFrame {
         invadersMenuItem = new javax.swing.JMenuItem();
         optionsMenu = new javax.swing.JMenu();
         defaultsMenuItem = new javax.swing.JMenuItem();
+        closeInternalWindowMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
-        statusLabel.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
-        statusLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        statusLabel.setMaximumSize(new java.awt.Dimension(999999999, 999999999));
-        statusLabel.setMinimumSize(new java.awt.Dimension(4, 25));
+        javax.swing.GroupLayout desktopPaneLayout = new javax.swing.GroupLayout(desktopPane);
+        desktopPane.setLayout(desktopPaneLayout);
+        desktopPaneLayout.setHorizontalGroup(
+            desktopPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 869, Short.MAX_VALUE)
+        );
+        desktopPaneLayout.setVerticalGroup(
+            desktopPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 610, Short.MAX_VALUE)
+        );
 
         fileMenu.setMnemonic('F');
         fileMenu.setText("File");
@@ -130,6 +168,15 @@ public class MainFrame extends javax.swing.JFrame {
         });
         optionsMenu.add(defaultsMenuItem);
 
+        closeInternalWindowMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_MASK));
+        closeInternalWindowMenuItem.setText("Close Internal Window");
+        closeInternalWindowMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeInternalWindowMenuItemActionPerformed(evt);
+            }
+        });
+        optionsMenu.add(closeInternalWindowMenuItem);
+
         mainMenuBar.add(optionsMenu);
 
         helpMenu.setMnemonic('H');
@@ -153,68 +200,128 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 869, Short.MAX_VALUE)
+            .addComponent(desktopPane)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(585, Short.MAX_VALUE)
-                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(desktopPane)
         );
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //==========================================================================
+    // Exit
+    //==========================================================================
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
+        // Close internal frames and co.
+        formWindowClosing(null);
         dispose();
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
+    //==========================================================================
+    // About
+    //==========================================================================
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
-        if (aboutDialog == null) 
+        if (aboutDialog == null) {
             aboutDialog = new AboutDialog(this, false); // or rootPaneCheckingEnabled
+        }
         aboutDialog.setVisible(true);
     }//GEN-LAST:event_aboutMenuItemActionPerformed
 
+    //==========================================================================
+    // Palette
+    //==========================================================================
     private void paletteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paletteMenuItemActionPerformed
-        if (paletteFrame == null)
-            paletteFrame = new PaletteFrame();
-        paletteFrame.setVisible(true);
+        if (palette == null) setupPalette();
+        // Adding no duplicates
+        if (lastFocus.isEmpty()
+                || (lastFocus.size() > 0 && lastFocus.getLast() != palette)) lastFocus.push(palette);
+        show(palette);
     }//GEN-LAST:event_paletteMenuItemActionPerformed
 
+    private void setupPalette() {
+        palette = PaletteInternalFrame.getInstance();
+        palette.setMainFrame(this);            
+        palette.setDesktop(desktopPane);            
+        desktopPane.add(palette);
+    }
+
+    //==========================================================================
+    // Defaults
+    // Sets default size, location, etc. Creates widgets if they are not yet
+    // initialized.
+    //==========================================================================
     private void defaultsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultsMenuItemActionPerformed
         //----------------------------------------------------------------------
         // MainFrame
-        FrameMonitor.setDefaults(this, MainFrame.class.getName());
+        ContainerMonitor.setDefaults(this, MainFrame.class.getName());
 
         //----------------------------------------------------------------------
         // Notepad
-        var dispose = false;
-        if (notepadFrame == null) {
-            notepadFrame = new NotepadFrame();
-            dispose = true;
-        }
-        FrameMonitor.setDefaults(notepadFrame, NotepadFrame.class.getName());
-        if (dispose)
-            notepadFrame.dispose();
+        if (notepad == null) setupNotepad();
+        ContainerMonitor.setDefaults(notepad, NotepadInternalFrame.class.getName());
 
         //----------------------------------------------------------------------
         // Palette
-        dispose = false;
-        if (paletteFrame == null) {
-            paletteFrame = new PaletteFrame();
-            dispose = true;
-        }
-        FrameMonitor.setDefaults(paletteFrame, PaletteFrame.class.getName());
-        if (dispose)
-            paletteFrame.dispose();
+        if (palette == null) setupPalette();
+        ContainerMonitor.setDefaults(palette, PaletteInternalFrame.class.getName());
     }//GEN-LAST:event_defaultsMenuItemActionPerformed
 
+    //==========================================================================
+    // Notepad
+    //==========================================================================
     private void notepadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_notepadMenuItemActionPerformed
-        if (notepadFrame == null)
-            notepadFrame = new NotepadFrame();
-        notepadFrame.setVisible(true);
+        if (notepad == null) setupNotepad();
+        // Adding no duplicates
+        if (lastFocus.isEmpty()
+                || (lastFocus.size() > 0 && lastFocus.getLast() != notepad)) lastFocus.push(notepad);
+        show(notepad);
     }//GEN-LAST:event_notepadMenuItemActionPerformed
+
+    private void setupNotepad() {
+        notepad = NotepadInternalFrame.getInstance();
+        notepad.setMainFrame(this);            
+        notepad.setDesktop(desktopPane);            
+        desktopPane.add(notepad);
+    }
+
+    //==========================================================================
+    // Show internal frame
+    //==========================================================================
+    public void show(JInternalFrame frame) {
+        frame.setVisible(true);
+        frame.toFront();
+        try {
+            frame.setSelected(true);
+        } catch (PropertyVetoException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+    }
+    
+    //==========================================================================
+    // Close (Hide!) internal frame
+    //==========================================================================
+    private void closeInternalWindowMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeInternalWindowMenuItemActionPerformed
+//        if (lastFocus.size() > 0) {
+//            lastFocus.pop().hide();
+//        }
+        JInternalFrame selected = desktopPane.getSelectedFrame();
+        if (selected != null) selected.hide();
+    }//GEN-LAST:event_closeInternalWindowMenuItemActionPerformed
+
+    //==========================================================================
+    // Closing
+    //==========================================================================
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        if (notepad != null) {
+            notepad.dispose();
+        }
+        if (palette != null) {
+            palette.dispose();
+        }
+    }//GEN-LAST:event_formWindowClosing
     
     /**
      * @param args the command line arguments
@@ -253,7 +360,9 @@ public class MainFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutMenuItem;
+    private javax.swing.JMenuItem closeInternalWindowMenuItem;
     private javax.swing.JMenuItem defaultsMenuItem;
+    private javax.swing.JDesktopPane desktopPane;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu gameMenu;
@@ -263,7 +372,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem notepadMenuItem;
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JMenuItem paletteMenuItem;
-    private javax.swing.JLabel statusLabel;
     private javax.swing.JMenu utilityMenu;
     // End of variables declaration//GEN-END:variables
 }

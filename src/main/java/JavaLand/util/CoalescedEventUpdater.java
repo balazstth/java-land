@@ -15,7 +15,7 @@ public class CoalescedEventUpdater {
     private Timer timer;
 
     public CoalescedEventUpdater(int delay, Runnable callback) {
-        timer = new Timer(delay, e -> {
+        timer = new Timer(delay, evt -> {
             timer.stop();
             callback.run();
         });
