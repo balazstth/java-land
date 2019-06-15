@@ -5,7 +5,6 @@
  */
 package JavaLand.ui;
 
-import JavaLand.JA;
 import JavaLand.util.ContainerMonitor;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
